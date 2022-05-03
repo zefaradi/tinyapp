@@ -63,9 +63,6 @@ app.get("/set", (req, res) => {
 
  app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  console.log("urlDatabase:", urlDatabase);
-  console.log("shortURL:",shortURL);
-  console.log("urlDatabase[shortURL]:", urlDatabase[shortURL]);
   res.redirect(urlDatabase[shortURL]);
 });
 
