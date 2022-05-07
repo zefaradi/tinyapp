@@ -76,6 +76,13 @@ app.get("/set", (req, res) => {
   res.redirect(urlDatabase[shortURL]);
 });
 
+app.get("/register", (req, res) => {
+
+  const templateVars = { 
+    username: req.cookies["username"] };
+  res.render("urls_registration", templateVars);
+})
+
  // POST REQUEST -----------------------------------------------------
  //code to take to the shortURL page
  app.post("/urls", (req, res) => {
