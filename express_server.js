@@ -3,7 +3,7 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8800; // default port 8800
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser())
@@ -15,8 +15,31 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-// program to generate random strings
+//Gloabl Users data
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "d@d.com", 
+    password: "crazy"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
 
+//E-mail look up helper function
+const emailLookup = (email, database) => {
+  for (let user in database) {
+    if (database[user].email === email) {
+      return database[user];
+    }
+  }
+  return undefined;
+};
+
+// program to generate random strings
 // declare all characters
 const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -38,14 +61,16 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = { 
     urls: urlDatabase, 
-    username: req.cookies["username"] };
+    users: users[req.cookies["user_id"]]
+    };
  
   res.render("urls_index", templateVars);
 })
 
 app.get("/urls/new", (req, res) => {
   const templateVars = { 
-    username: req.cookies["username"] };
+    users: users[req.cookies["user_id"]] };
+
   res.render("urls_new", templateVars);
 });
 
@@ -53,8 +78,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { 
     shortURL: req.params.shortURL, 
     longURL:urlDatabase[req.params.shortURL], 
-    username: req.cookies["username"] };
-    console.log("Testing: ")
+    users: users[req.cookies["user_id"]] };
   res.render("urls_show", templateVars);
 });
 
@@ -62,19 +86,83 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
- });
- 
- app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`);
- });
-
- app.get("/u/:shortURL", (req, res) => {
+app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   res.redirect(urlDatabase[shortURL]);
 });
+
+// REGISTER PAGE
+app.get("/register", (req, res) => {
+
+  const templateVars = { 
+    users: users[req.cookies["user_id"]] };
+
+  if (req.cookies['user_id']) {
+    res.redirect("/urls")
+  }
+    
+  res.render("urls_registration", templateVars);
+  
+})
+
+// POST code to register
+app.post("/register", (req, res) => {
+  
+  const { email, password } = req.body;
+  const user = emailLookup(email, users);
+  const id = generateString()
+
+  if(user) {
+    res.status(403);
+    res.send("An account with this email already exists");
+  } else if (email === "" || password === "") {
+    res.status(403);
+    res.send("Either the email or password are empty");
+  } else {
+    users[id] = {"id":id, "email":email, "password": password };
+
+    console.log(users);
+  
+    res.cookie("user_id", id);
+    res.redirect("/urls/");
+  }
+  
+})
+
+//LOGIN PAGE
+app.get("/login", (req, res) => {
+  const templateVars = { 
+    userID: req.cookies['user_id'],
+    users: users[req.cookies["user_id"]] };
+
+  if (req.cookies['user_id']) {
+    res.redirect("/urls")
+  }
+    res.render("urls_login", templateVars);
+})
+
+//POST code for login
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+  const user = emailLookup(email, users);
+  // const verifyPd = passwordCheck(email, password);
+  // console.log(email, password);
+  
+  // console.log({user});
+  // console.log(verifyPd);
+
+  if (user && user.password === password) {
+    res.cookie("user_id", user.id);
+    res.redirect("/urls");
+  } else if (!user) {
+    res.status(403);
+    res.send("There is no account with this email.")
+  } else {
+    res.status(403);
+    res.send("Invalid login credentials.");
+  }
+
+})
 
  // POST REQUEST -----------------------------------------------------
  //code to take to the shortURL page
@@ -104,19 +192,10 @@ app.post("/urls/:id", (req, res) => {
 
 });
 
-// code for logging in
-app.post("/login", (req, res) => {
-  const username = req.body.username;
-
-  res.cookie("username", username);
-  res.redirect("/urls/");
-  
-})
-
 //code for loggin out
 app.post("/logout", (req, res) => {
   
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls/");
   
 })

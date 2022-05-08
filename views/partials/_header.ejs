@@ -9,18 +9,16 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
-      <% if (username) { %>
-        <span>
-          <%= username %>
-          <form method = "POST" action = "/logout"> // creting logout button
-          <input type = "submit" value = "logout">
-          </form>  
-        </span>
-      <% } else {%>
-          <form method = "POST" action = "/login"> // creting login button
-          <label for = "username"> username:</label>
-          <input type ="username" name = "username">
-          <input type = "submit" value = "sign in">
+      <% if (!users) { %>
+        <!--creating login button -->
+        <a href = "/login" class = "btn btn-outline-primary"> Login</a>
+       
+        <!--creating register button -->
+        <a href = "/register" class = "btn btn-outline-primary"> Register</a>
+    <% } else {%>
+        <form method = "POST" action = "/logout"> <!--creating logout button -->
+        <label for="">Logged In As: <%= users.email %>!</label>
+        <input type = "submit" value = "Logout">
         </form>              
       <%}%>
     </div> 
