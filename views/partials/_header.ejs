@@ -10,15 +10,14 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
       <% if (!users) { %>
-        <form method = "GET" action = "/login"> <!--creating login button -->
-        <input type = "submit" value = "Login">
-        </form>
-        <form method = "GET" action = "/register"> <!--creating register button -->
-        <input type = "submit" value = "Register">
-        </form>            
+        <!--creating login button -->
+        <a href = "/login" class = "btn btn-outline-primary"> Login</a>
+       
+        <!--creating register button -->
+        <a href = "/register" class = "btn btn-outline-primary"> Register</a>
     <% } else {%>
         <form method = "POST" action = "/logout"> <!--creating logout button -->
-        <label for="">Logged In As: <%= user.email %>!</label>
+        <label for="">Logged In As: <%= users.email %>!</label>
         <input type = "submit" value = "Logout">
         </form>              
       <%}%>
