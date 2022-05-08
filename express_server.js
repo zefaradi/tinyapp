@@ -99,11 +99,21 @@ app.get("/set", (req, res) => {
   res.redirect(urlDatabase[shortURL]);
 });
 
+// REGISTER PAGE
 app.get("/register", (req, res) => {
 
   const templateVars = { 
     users: users[req.cookies["user_id"]] };
   res.render("urls_registration", templateVars);
+})
+
+//LOGIN PAGE
+app.get("/login", (req, res) => {
+  const templateVars = { 
+    userID: req.cookies['user_id'],
+    users: users[req.cookies["user_id"]] };
+
+  res.render("urls_login", templateVars);
 })
 
  // POST REQUEST -----------------------------------------------------
@@ -166,7 +176,7 @@ app.post("/register", (req, res) => {
 
   if(emailLookup(email)) {
     res.status(400);
-    res.send("This email already exists")
+    res.send("An account with this email already exists");
   } else if (email === "" || password === "") {
     res.status(400);
     res.send("Either the email or password are empty");
