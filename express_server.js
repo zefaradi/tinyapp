@@ -10,6 +10,8 @@ app.use(cookieParser())
 
 app.set("view engine", "ejs");
 
+
+// URL data
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -29,6 +31,7 @@ const users = {
   }
 }
 
+//HELPER FUNCTIONS
 //E-mail look up helper function
 const emailLookup = (email, database) => {
   for (let user in database) {
@@ -40,7 +43,6 @@ const emailLookup = (email, database) => {
 };
 
 // program to generate random strings
-// declare all characters
 const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 function generateString() {
@@ -54,10 +56,12 @@ function generateString() {
     return result.trim();
 }
 
+//HOMEPAGE
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+//GET REQUEST FOR A LIST OF URLS
 app.get("/urls", (req, res) => {
   const templateVars = { 
     urls: urlDatabase, 
@@ -67,6 +71,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 })
 
+//GET REQUEST TO CREATE A NEW URL
 app.get("/urls/new", (req, res) => {
   const templateVars = { 
     users: users[req.cookies["user_id"]] };
@@ -74,6 +79,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
+//GET REQUEST TO GO TO THE SHORT URL
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { 
     shortURL: req.params.shortURL, 
@@ -82,10 +88,7 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
+//GET REQUEST TO GO TO THE LONG URL
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   res.redirect(urlDatabase[shortURL]);
@@ -145,11 +148,6 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   const user = emailLookup(email, users);
-  // const verifyPd = passwordCheck(email, password);
-  // console.log(email, password);
-  
-  // console.log({user});
-  // console.log(verifyPd);
 
   if (user && user.password === password) {
     res.cookie("user_id", user.id);
