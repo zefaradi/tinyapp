@@ -10,13 +10,36 @@ app.use(cookieParser())
 
 app.set("view engine", "ejs");
 
+//E-mail look up helper function
+const emailLookup = (email) => {
+  for (let user in users) {
+    if (users[user].email === email) {
+      return users[user];
+    }
+  }
+  return false;
+};
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
-// program to generate random strings
+//Gloabl Users data
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
 
+// program to generate random strings
 // declare all characters
 const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -38,14 +61,15 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = { 
     urls: urlDatabase, 
-    username: req.cookies["username"] };
+    users: users[req.cookies["user_id"]]
+    };
  
   res.render("urls_index", templateVars);
 })
 
 app.get("/urls/new", (req, res) => {
   const templateVars = { 
-    username: req.cookies["username"] };
+    users: users[req.cookies["user_id"]] };
   res.render("urls_new", templateVars);
 });
 
@@ -53,8 +77,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { 
     shortURL: req.params.shortURL, 
     longURL:urlDatabase[req.params.shortURL], 
-    username: req.cookies["username"] };
-    console.log("Testing: ")
+    users: users[req.cookies["user_id"]] };
   res.render("urls_show", templateVars);
 });
 
@@ -79,7 +102,7 @@ app.get("/set", (req, res) => {
 app.get("/register", (req, res) => {
 
   const templateVars = { 
-    username: req.cookies["username"] };
+    users: users[req.cookies["user_id"]] };
   res.render("urls_registration", templateVars);
 })
 
@@ -113,18 +136,48 @@ app.post("/urls/:id", (req, res) => {
 
 // code for logging in
 app.post("/login", (req, res) => {
-  const username = req.body.username;
+  const email = req.body.email;
+  const user = emailLookup(email);
 
-  res.cookie("username", username);
-  res.redirect("/urls/");
+  if (user) {
+    res.cookie("user_id", user.id);
+    res.redirect("/urls/");
+  } else {
+    res.status(400);
+    res.send("No account has been registered with this account");
+  }
   
 })
 
 //code for loggin out
 app.post("/logout", (req, res) => {
   
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls/");
+  
+})
+
+//POST code for registration
+app.post("/register", (req, res) => {
+  
+  const email = req.body.email;
+  const password = req.body.password;
+  const id = generateString()
+
+  if(emailLookup(email)) {
+    res.status(400);
+    res.send("This email already exists")
+  } else if (email === "" || password === "") {
+    res.status(400);
+    res.send("Either the email or password are empty");
+  } else {
+    users[id] = {"id":id, "email":email, "password": password };
+
+    console.log(users);
+  
+    res.cookie("user_id", id);
+    res.redirect("/urls/");
+  }
   
 })
 
