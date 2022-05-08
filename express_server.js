@@ -39,16 +39,6 @@ const emailLookup = (email, database) => {
   return undefined;
 };
 
-//Password look up function
-// const passwordCheck = (email, password) => {
-//   for (let individual in users) {
-//     if (users[individual].email === email && users[individual].password === password) {
-//       return true;
-//     }
-//   }
-//   return false;
-// }
-
 // program to generate random strings
 // declare all characters
 const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
