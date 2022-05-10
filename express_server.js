@@ -55,36 +55,19 @@ app.get("/", (req, res) => {
 
 //GET REQUEST FOR THE LIST OF URLS
 app.get("/urls", (req, res) => {
-  // if (req.cookies["user_id"]) {
     const templateVars = { 
       urls: urlsForUser(req.session.user_id, urlDatabase), 
       users: users[req.session.user_id]
       };
    
     res.render("urls_index", templateVars);
-  // } 
-  // else {
-    // res.redirect('/login');
-    // res.status(404);
-    // res.send("Please login or register to see the shortURL")
-  // }
-  
-  // if (!req.cookies["user_id"]) {
-  //   res.status(404);
-  //   res.send("Please login or register to see the shortURL")
-  // }
 })
 
 //GET REQUEST TO CREATE A NEW URL
 app.get("/urls/new", (req, res) => {
-  // if (req.session.user_id) {
     const templateVars = { 
       users: users[req.session.user_id] };
-  
     res.render("urls_new", templateVars);
-  // } else {
-    // res.redirect('/login');
-  // }
 });
 
 //GET REQUEST TO GO TO THE SHORT URL
