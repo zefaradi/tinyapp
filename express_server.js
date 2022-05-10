@@ -48,6 +48,11 @@ const users = {
   }
 };
 
+//HOMEPAGE
+app.get("/", (req, res) => {
+  res.redirect("/urls");
+});
+
 //GET REQUEST FOR THE LIST OF URLS
 app.get("/urls", (req, res) => {
   const templateVars = {
