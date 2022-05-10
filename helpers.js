@@ -1,5 +1,3 @@
-const { urlDatabase, users } = require('./database');
-
 //HELPER FUNCTIONS
 
 // program to generate random strings for URLs and and User IDs.
