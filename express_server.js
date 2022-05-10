@@ -48,11 +48,6 @@ const users = {
   }
 }
 
-//HOMEPAGE
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
 //GET REQUEST FOR THE LIST OF URLS
 app.get("/urls", (req, res) => {
     const templateVars = { 
