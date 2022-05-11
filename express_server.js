@@ -50,7 +50,7 @@ const users = {
 
 //HOMEPAGE
 app.get("/", (req, res) => {
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 //GET REQUEST FOR THE LIST OF URLS
@@ -65,23 +65,35 @@ app.get("/urls", (req, res) => {
 
 //GET REQUEST TO CREATE A NEW URL
 app.get("/urls/new", (req, res) => {
+
   const templateVars = {
     users: users[req.session.user_id] };
-  res.render("urls_new", templateVars);
+
+  if (req.session.user_id) {
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/login");
+  }
+
+
+  // const templateVars = {
+  //   users: users[req.session.user_id] };
+  // res.render("urls_new", templateVars);
 });
 
 //GET REQUEST TO GO TO THE SHORT URL
 app.get("/urls/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL
   if (!req.session.user_id) {
     res.status(404);
     res.send("Please login to access the URLs");
-  } else if (!urlDatabase[req.params.shortURL]) {
+  } else if (!urlDatabase[shortURL]) {
     res.status(404);
     res.send("This short URL does not exist");
-  } else if (urlDatabase[req.params.shortURL] && urlDatabase[req.params.shortURL].userID === req.session.user_id) {
+  } else if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === req.session.user_id) {
     const templateVars = {
-      shortURL: req.params.shortURL,
-      longURL:urlDatabase[req.params.shortURL].longURL,
+      shortURL: shortURL,
+      longURL:urlDatabase[shortURL].longURL,
       users: users[req.session.user_id] };
     res.render("urls_show", templateVars);
   } else {
@@ -189,9 +201,11 @@ app.post("/urls", (req, res) => {
 
 //code to delete shortURL
 app.post("/urls/:shortURL/delete", (req, res) => {
+
+  const shortURL = req.params.shortURL;
   if (req.session.user_id) {
-    if (urlDatabase[req.params.shortURL] && urlDatabase[req.params.shortURL].userID === req.session.user_id) {
-      const shortURL = req.params.shortURL;
+    if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === req.session.user_id) {
+      const shortURL = shortURL;
       delete urlDatabase[shortURL];
       res.redirect("/urls/");
     } else {
@@ -208,10 +222,10 @@ app.post("/urls/:id", (req, res) => {
     const longURL = req.body.longURL;
     const shortURL = req.params.id;
     urlDatabase[shortURL].longURL = longURL;
-    res.redirect(`/urls/${shortURL}`);
+    res.redirect(`/urls`);
   } else {
     res.status(404);
-    res.send("You are not logged in with thr correct credentials to access this shortURL");
+    res.send("You are not logged in with the correct credentials to access this shortURL");
   }
 });
 
