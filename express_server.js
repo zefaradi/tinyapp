@@ -10,7 +10,7 @@ const {
 } = require('./helpers');
 
 const app = express();
-const PORT = 8800; // default port 8800
+const PORT = 8080; // default port 8080
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
@@ -75,10 +75,6 @@ app.get("/urls/new", (req, res) => {
     res.redirect("/login");
   }
 
-
-  // const templateVars = {
-  //   users: users[req.session.user_id] };
-  // res.render("urls_new", templateVars);
 });
 
 //GET REQUEST TO GO TO THE SHORT URL
@@ -200,17 +196,19 @@ app.post("/urls", (req, res) => {
 });
 
 //code to delete shortURL
+
 app.post("/urls/:shortURL/delete", (req, res) => {
 
+  const userId = req.session.user_id;
   const shortURL = req.params.shortURL;
-  if (req.session.user_id) {
-    if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === req.session.user_id) {
-      const shortURL = shortURL;
+  const url = urlDatabase[shortURL]; 
+  if (userId) {
+    if (url && url.userID === userId) {
       delete urlDatabase[shortURL];
       res.redirect("/urls/");
     } else {
       res.status(404);
-      res.send("You are not logged in with thr correct credentials to access this shortURL");
+      res.send("You are not logged in with the correct credentials to access this shortURL");
     }
   }
 
@@ -222,7 +220,7 @@ app.post("/urls/:id", (req, res) => {
     const longURL = req.body.longURL;
     const shortURL = req.params.id;
     urlDatabase[shortURL].longURL = longURL;
-    res.redirect(`/urls`);
+    res.redirect("/urls");
   } else {
     res.status(404);
     res.send("You are not logged in with the correct credentials to access this shortURL");
